@@ -61,13 +61,15 @@ if [ ! -d .maven ]; then
   echo " done"
 fi
 
-MAVEN_SETTINGS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-java/settings.xml"
+MAVEN_SETTINGS_URL="${MAVEN_SETTINGS_URL:-https://s3.amazonaws.com/com.automatic.heroku-jvm-langpack-java/settings.xml}"
 
 echo -n "-----> Installing settings.xml..."
 if [ -f .m2/settings.xml ]; then
   rm .m2/settings.xml 
 fi
-curl --silent --max-time 10 --location $MAVEN_SETTINGS_URL --output .m2/settings.xml
+curl --silent --max-time 10 --location $MAVEN_SETTINGS_URL --output .m2/settings.xml.tmpl
+cat .m2/settings.xml.tmpl | sed "s/MAVEN_PASSWORD/${MAVEN_PASSWORD}/" | sed "s/MAVEN_USERNAME/${MAVEN_USERNAME}/" > .m2/settings.xml
+rm .m2/settings.xml.tmpl
 echo " done"
 
 # change to build dir to run maven
